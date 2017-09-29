@@ -12,8 +12,8 @@ Imports System.Windows
 ' Review the values of the assembly attributes
 
 <Assembly: AssemblyTitle("Gatekeeper2018")>
-<Assembly: AssemblyDescription("")>
-<Assembly: AssemblyCompany("")>
+<Assembly: AssemblyDescription("Front end for Gatekeeper Suite 2018")>
+<Assembly: AssemblyCompany("Ashby School")>
 <Assembly: AssemblyProduct("Gatekeeper2018")>
 <Assembly: AssemblyCopyright("Copyright ©  2017")>
 <Assembly: AssemblyTrademark("")>
