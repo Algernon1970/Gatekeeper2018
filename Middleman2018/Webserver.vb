@@ -1,10 +1,13 @@
 ﻿Imports System.Net
 Imports System.Text
 Imports System.IO
+Imports System.ComponentModel
+Imports AshbyTools
 
 Public Class Webserver
     Const listenerPrefix As String = "http://*:1701/"
     Dim listener As HttpListener
+    Dim cancelled As Boolean = False
 
     Public Sub StartServer()
         listener = New HttpListener
@@ -14,6 +17,8 @@ Public Class Webserver
     End Sub
 
     Public Sub StopServer()
+        cancelled = True
+        listener.Close()
         listener.Stop()
     End Sub
 
@@ -21,12 +26,11 @@ Public Class Webserver
         If Not listener.IsListening Then
             listener.BeginGetContext(AddressOf RequestWait, Nothing)
         End If
-
         Dim formattedResponse As String = ""
-        Dim c As HttpListenerContext = listener.EndGetContext(ar)
+        Dim c = listener.EndGetContext(ar)
         listener.BeginGetContext(AddressOf RequestWait, Nothing)
-
         Respond(c, HandleCommands(c))
+
     End Sub
 
     Private Sub Respond(ByRef c As HttpListenerContext, ByVal response As String)
@@ -40,17 +44,15 @@ Public Class Webserver
     End Sub
 
     Private Function HandleCommands(ByRef c As HttpListenerContext)
-        Dim cmd As String = c.Request.QueryString("command")
-        Dim params As String = c.Request.QueryString("cmdlines")
         Try
-            If IsNothing(params) Then
-                Return CStr(CallByName(New CommandHandler, cmd, Microsoft.VisualBasic.CallType.Method))
+            If IsNothing(c.Request.QueryString("cmdlines")) Then
+                Return CStr(CallByName(New CommandHandler, c.Request.QueryString("command"), Microsoft.VisualBasic.CallType.Method))
             Else
-                Return CStr(CallByName(New CommandHandler, cmd, Microsoft.VisualBasic.CallType.Method, params))
+                Return CStr(CallByName(New CommandHandler, c.Request.QueryString("command"), Microsoft.VisualBasic.CallType.Method, c.Request.QueryString("cmdlines")))
             End If
 
         Catch ex As Exception
-            Return "Failed to call " & cmd
+            Return "Failed to call " & c.Request.QueryString("command")
         End Try
     End Function
 
